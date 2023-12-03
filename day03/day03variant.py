@@ -15,7 +15,7 @@ def has_adjacent_symbol(i, j):
                     has_symbol = True
     return has_symbol
 
-
+# variant does work with test input, not with actual input, maybe visit later again..
 def puzzle_a():
     total_sum = 0
     visited = []
