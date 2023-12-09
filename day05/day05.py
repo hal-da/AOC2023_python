@@ -1,8 +1,10 @@
-from day05data import test as inp
+from day05data import inp as inp
 
 input_map = inp.split('\n\n')
 
 # CORRECT A: 1181555926
+# WRONG _B: 0, 37466397, 6683080
+
 
 input_map = [m.split(':') for m in input_map]
 seeds = input_map.pop(0)[1].strip().split(' ')
@@ -15,7 +17,7 @@ def get_mapping(arr: [], src: int) -> int:
     return src
 
 
-def build_map():
+def puzzle_a():
     mapped_seeds = []
     my_arr = []
     for z in input_map:
@@ -30,24 +32,9 @@ def build_map():
     print(min(mapped_seeds))
 
 
-def puzzle_b_naive():
-    lowest_no = 99999999999999999
-    my_arr = []
-    for z in input_map:
-        arr = [[int(s) for s in s.split(' ')] for s in z[1].strip().split('\n')]
-        my_arr.append(arr)
-
-    for i in range(408612163):
-        x = i + 364807853
-        for to_map in my_arr:
-            x = get_mapping(to_map, x)
-        if x < lowest_no:
-            lowest_no = x
-    print(lowest_no)
-
-
-def get_mapped(map_arr, seed_map, mapped_seeds):
+def get_maps(map_arr, seed_map, mapped_seeds):
     # print(map_arr, " die verschiebungen")
+    # print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", seed_map, mapped_seeds)
     lower_seed_bound = seed_map[0]
     upper_seed_bound = seed_map[1]
     # print(seed_map, " die seeds")
@@ -59,87 +46,85 @@ def get_mapped(map_arr, seed_map, mapped_seeds):
         # print(lower_bound, lower_seed_bound, " L")
         # print(upper_bound, upper_seed_bound, " U")
         shift = shift_arr[0] - shift_arr[1]
-        if lower_bound <= lower_seed_bound and upper_bound >= upper_seed_bound:
-            print("NEUE BOUNDS um ", shift)
+        if lower_bound < lower_seed_bound and upper_bound > upper_seed_bound:
+            # print("NEUE BOUNDS um ", shift)
             mapped_seeds.append([lower_seed_bound + shift, upper_seed_bound + shift])
             return
 
-        if lower_seed_bound <= lower_bound <= upper_seed_bound <= upper_bound:
-            no_shift_seeds = [lower_seed_bound, lower_bound - 1]
-            mapped_seeds.append(no_shift_seeds)
+        if lower_seed_bound < lower_bound < upper_seed_bound < upper_bound:
+            no_shift_seeds = [lower_seed_bound, lower_bound]
+            get_maps(map_arr, no_shift_seeds, mapped_seeds)
             shifted_seeds = [lower_bound + shift, upper_seed_bound + shift]
             mapped_seeds.append(shifted_seeds)
-            print(lower_bound, lower_seed_bound, " L")
-            print(upper_bound, upper_seed_bound, " U")
-            print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-            print("lower seed bound: ", lower_seed_bound," upper seed bound", upper_seed_bound, "lower bound ", lower_bound, " upper bound: ", upper_bound)
-            print("no shift seeds: ", no_shift_seeds)
-            print("shifted seeds: ", shifted_seeds, " waren ", lower_bound, " plus shift", shift)
-            return
+            # print(lower_bound, lower_seed_bound, " L")
+            # print(upper_bound, upper_seed_bound, " U")
+            # print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+            # print("lower seed bound: ", lower_seed_bound, " upper seed bound", upper_seed_bound, "lower bound ",
+            #       lower_bound, " upper bound: ", upper_bound)
+            # print("no shift seeds: ", no_shift_seeds)
+            # print("shifted seeds: ", shifted_seeds, " waren ", lower_bound, " plus shift", shift)
 
-        if lower_bound <= lower_seed_bound <= upper_bound <= upper_seed_bound:
-            no_shift_seeds = [upper_bound + 1, upper_seed_bound]
-            mapped_seeds.append(no_shift_seeds)
-            shifted_seeds = [lower_seed_bound + shift, upper_bound]
+        if lower_bound < lower_seed_bound < upper_bound < upper_seed_bound:
+            no_shift_seeds = [upper_bound, upper_seed_bound]
+
+            get_maps(map_arr, no_shift_seeds, mapped_seeds)
+            shifted_seeds = [lower_seed_bound + shift, upper_bound + shift]
             mapped_seeds.append(shifted_seeds)
 
-            print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
-            print("lower seed bound: ", lower_seed_bound, " upper seed bound", upper_seed_bound, "lower bound ",
-                  lower_bound, " upper bound: ", upper_bound)
-            print("no shift seeds: ", no_shift_seeds)
-            print("shifted seeds: ", shifted_seeds, " waren ", lower_bound, " plus shift", shift)
-            return
+            # print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
+            # print("lower seed bound: ", lower_seed_bound, " upper seed bound", upper_seed_bound, "lower bound ",
+            #       lower_bound, " upper bound: ", upper_bound)
+            # print("no shift seeds: ", no_shift_seeds)
+            # print("shifted seeds: ", shifted_seeds, " waren ", lower_bound, " plus shift", shift)
+            continue
 
-        if lower_seed_bound <= lower_bound and upper_seed_bound >= upper_bound:
-            lower_no_shift_seeds = [lower_seed_bound, lower_bound - 1]
-            mapped_seeds.append(lower_no_shift_seeds)
+        if lower_seed_bound < lower_bound and upper_seed_bound > upper_bound:
+            lower_no_shift_seeds = [lower_seed_bound, lower_bound]
+            upper_no_shift_seeds = [upper_bound, upper_seed_bound]
             shift_seeds = [lower_bound + shift, upper_bound + shift]
+            get_maps(map_arr, lower_no_shift_seeds, mapped_seeds)
+            get_maps(map_arr, upper_no_shift_seeds, mapped_seeds)
             mapped_seeds.append(shift_seeds)
-            upper_no_shift_seeds = [upper_bound+1,upper_seed_bound]
-            mapped_seeds.append(upper_no_shift_seeds)
-            print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
-            print("lower seed bound: ", lower_seed_bound, " upper seed bound", upper_seed_bound, "lower bound ",
-                  lower_bound, " upper bound: ", upper_bound)
-            print("no shift seeds: ", lower_no_shift_seeds, " und ", upper_no_shift_seeds)
-            print("shifted seeds: ", shift_seeds, " waren ", lower_bound, " plus shift", shift)
+            # print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
+            # print("lower seed bound: ", lower_seed_bound, " upper seed bound", upper_seed_bound, "lower bound ",
+            #       lower_bound, " upper bound: ", upper_bound)
+            # print("no shift seeds: ", lower_no_shift_seeds, " und ", upper_no_shift_seeds)
+            # print("shifted seeds: ", shift_seeds, " waren ", lower_bound, " plus shift", shift)
             return
-        # print(lower_bound, " lower bound", upper_bound, " upper_bound")
     mapped_seeds.append(seed_map)
-    # print(" KEINE VERSCHIEBUNG ")
 
 
-def puzzle_b():
-    seed_range = []
-    # print(seeds)
+def puzzle_b_naive():
+    seed_range = [[] for _ in range(8)]
     for i in range(len(seeds)):
         if i % 2 == 0:
-            seed_range.append([int(seeds[i]), int(seeds[i]) + int(seeds[i + 1]) - 1])
-
-    # print(seed_range)
+            seed_range[0].append([int(seeds[i]), int(seeds[i]) + int(seeds[i + 1]) - 1])
 
     shift_maps = [[z for z in z[1].split('\n') if z] for z in input_map]
     shift_maps = [[[int(i) for i in a.split(" ")] for a in arr] for arr in shift_maps]
-    # print(my_arr)
-    new_seed_pairs = []
 
-    for maps in shift_maps:
-        print(maps)
-        new_seed_pairs = []
-        for seed_pairs in seed_range:
-            print(seed_pairs)
-            get_mapped(maps, seed_pairs, new_seed_pairs)
-            print(new_seed_pairs, " NEW SEED PAIRS IN MAIN FUN")
-        print("alle seedpairs abgearbeitet oida")
-        # return
-        seed_range = new_seed_pairs
-    # print(new_seed_pairs)
-    lowest = 9999999999999999999999999999
+    for i, shift_map in enumerate(shift_maps):
+        new_pairs = []
+        for pair in seed_range[i]:
+            get_maps(shift_map, pair, new_pairs)
+        if i < len(seed_range):
+            seed_range[i + 1] += new_pairs
+    print(seed_range)
 
-    for p in seed_range:
-        for x in p:
-            if x < lowest:
-                lowest = x
+    lowest = 99999999999999999999999999999999999999
+
+    for x in seed_range:
+        for y in x:
+            for z in y:
+                if z < lowest:
+                    lowest = z
+
     print(lowest)
+    # print(seed_range)
 
 
-puzzle_b()
+# puzzle_b()
+# puzzle_a()
+
+
+puzzle_b_naive()

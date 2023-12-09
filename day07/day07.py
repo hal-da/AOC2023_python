@@ -54,13 +54,13 @@ my_dict_puzzle_b = {"A": 14, "K": 13, "Q": 12, "J": 1, "T": 10, "9": 9, "8": 8, 
 
 
 class Sorting:
-    def __init__(self, dict):
-        self.dict = dict
+    def __init__(self, my_dict):
+        self.my_dict = my_dict
 
     def sort_by_card(self, a, b):
         if a[2] == b[2]:
-            a = [self.dict[x] for x in a[0]]
-            b = [self.dict[x] for x in b[0]]
+            a = [self.my_dict[x] for x in a[0]]
+            b = [self.my_dict[x] for x in b[0]]
             if a > b:
                 return 1
             elif a < b:
