@@ -188,6 +188,8 @@ def puzzle_b():
                 dots += 1
     print(dots)
 
+
+def plot_plot():
     data = np.array(x)
     unique_chars, matrix = np.unique(data, return_inverse=True)
     color_dict = {
